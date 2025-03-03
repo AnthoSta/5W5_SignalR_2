@@ -38,14 +38,19 @@ export class ChatComponent  {
   connectToHub() {
     // On commence par créer la connexion vers le Hub
     this.hubConnection = new signalR.HubConnectionBuilder()
-                              .withUrl('http://localhost:5106/chat', { accessTokenFactory: () => sessionStorage.getItem("token")! })
+                              .withUrl('https://localhost:7060/chat', { accessTokenFactory: () => sessionStorage.getItem("token")! })
                               .build();
 
     // On peut commencer à écouter pour les messages que l'on va recevoir du serveur
     this.hubConnection.on('UsersList', (data) => {
-      this.usersList = data;
+      //this.usersList = data;
+      console.log(data)
     });
 
+    this.hubConnection.on('ChannelList', (data) => {
+     // this.channelsList = data
+         console.log(data)
+    })
     // TODO: Écouter le message pour mettre à jour la liste de channels
 
     this.hubConnection.on('NewMessage', (message) => {
@@ -82,10 +87,12 @@ export class ChatComponent  {
 
   createChannel(){
     // TODO: Ajouter un invoke
+    this.hubConnection?.invoke('CreateChannel', this.newChannelName)
   }
 
   deleteChannel(channel: Channel){
     // TODO: Ajouter un invoke
+    this.hubConnection?.invoke('DeleteChannel', channel)
   }
 
   leaveChannel(){
