@@ -42,27 +42,31 @@ export class ChatComponent  {
                               .build();
 
     // On peut commencer à écouter pour les messages que l'on va recevoir du serveur
-    this.hubConnection.on('UsersList', (data) => {
-      //this.usersList = data;
-      console.log(data)
+    this.hubConnection!.on('UsersList', (data) => {
+      this.usersList = data;
+      //console.log(data)
     });
 
-    this.hubConnection.on('ChannelList', (data) => {
-     // this.channelsList = data
-         console.log(data)
+    this.hubConnection!.on('ChannelList', (data : []) => {
+      this.channelsList = data
+         //console.log(data)
     })
     // TODO: Écouter le message pour mettre à jour la liste de channels
 
     this.hubConnection.on('NewMessage', (message) => {
       this.messages.push(message);
     });
-
+    
     // TODO: Écouter le message pour quitter un channel (lorsque le channel est effacé)
 
+    this.hubConnection.on('LeaveChannel', (message) => {
+      this.selectedChannel = null;
+    })
     // On se connecte au Hub
     this.hubConnection
       .start()
       .then(() => {
+        console.log("blabla")
         this.isConnectedToHub = true;
       })
       .catch(err => console.log('Error while starting connection: ' + err))
@@ -70,6 +74,7 @@ export class ChatComponent  {
 
   joinChannel(channel: Channel) {
     let selectedChannelId = this.selectedChannel ? this.selectedChannel.id : 0;
+    console.log(selectedChannelId)
     this.hubConnection!.invoke('JoinChannel', selectedChannelId, channel.id);
     this.selectedChannel = channel;
   }
