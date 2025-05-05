@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using signalr.backend.Data;
 using signalr.backend.Hubs;
+using signalr.backend.Services;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -21,7 +22,8 @@ builder.Services.AddDefaultIdentity<IdentityUser>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
 
 builder.Services.AddControllersWithViews();
-
+builder.Services.AddSingleton<PopularChannel>();
+builder.Services.AddHostedService<PopularChannel>(p => p.GetService<PopularChannel>());
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("CorsPolicy", builder => builder
@@ -31,7 +33,7 @@ builder.Services.AddCors(options =>
         .AllowCredentials());
 });
 
-string serverAdress = "http://localhost:5106";
+string serverAdress = "https://localhost:7060";
 
 SymmetricSecurityKey signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("C'est tellement la meilleure cle qui a jamais ete cree dans l'histoire de l'humanite (doit etre longue)"));
 

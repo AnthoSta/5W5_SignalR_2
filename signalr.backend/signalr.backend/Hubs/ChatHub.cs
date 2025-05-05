@@ -2,8 +2,10 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Hosting;
 using signalr.backend.Data;
 using signalr.backend.Models;
+using signalr.backend.Services;
 
 namespace signalr.backend.Hubs
 {
@@ -21,7 +23,7 @@ namespace signalr.backend.Hubs
     {
         public ApplicationDbContext _context;
 
-
+        public PopularChannel _backgroundservice;
         public IdentityUser CurentUser
         {
             get
@@ -36,9 +38,10 @@ namespace signalr.backend.Hubs
 
         }
 
-        public ChatHub(ApplicationDbContext context)
+        public ChatHub(ApplicationDbContext context, PopularChannel backgroundService)
         {
             _context = context;
+            _backgroundservice = backgroundService;
         }
 
         public async override Task OnConnectedAsync()
@@ -130,6 +133,8 @@ namespace signalr.backend.Hubs
             {
                 string groupName = CreateChannelGroupName(channelId);
                 Channel channel = _context.Channel.Find(channelId);
+                channel.NbMessages++;
+                await _context.SaveChangesAsync();
                 await Clients.Group(groupName).SendAsync("NewMessage", "[" + channel.Title + "] " + message);
             }
             else

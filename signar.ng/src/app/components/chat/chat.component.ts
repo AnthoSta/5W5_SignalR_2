@@ -43,7 +43,7 @@ export class ChatComponent  {
   connectToHub() {
     // TODO On doit commencer par créer la connexion vers le Hub
     this.hubConnection = new signalR.HubConnectionBuilder()
-                              .withUrl('http://localhost:5106/chat', { accessTokenFactory: () => sessionStorage.getItem("token")! })
+                              .withUrl('https://localhost:7060/chat', { accessTokenFactory: () => sessionStorage.getItem("token")! })
                               .build();
 
     // On peut commencer à écouter pour les messages que l'on va recevoir du serveur
@@ -61,6 +61,9 @@ export class ChatComponent  {
 
     this.hubConnection.on('LeaveChannel', (message) => {
       this.selectedChannel = null;
+    });
+    this.hubConnection.on('MostPopularChannel', (message) => {
+      alert("Vous êtes dans le canal le plus populaire avec " + message + " messages")
     });
 
     // On se connecte au Hub
